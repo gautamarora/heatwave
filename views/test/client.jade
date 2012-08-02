@@ -1,0 +1,8 @@
+extends ../layout
+
+block content
+	h1 Client Test Page
+		script 
+			jQuery(document).ready(function() {
+				jxy.init({role : 'client', uid : 493, host : '192.168.110.172', port : 3000});
+			});	

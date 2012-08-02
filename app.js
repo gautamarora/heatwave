@@ -47,6 +47,7 @@ app.configure('development', function(){
 // Routes
 app.get('/', routes.index);
 require('./routes/users')(app);
+require('./routes/test')(app);
 
 
 server = http.createServer(app).listen(app.get('port'), function(){
@@ -63,7 +64,7 @@ io.sockets.on('connection', function (socket) {
 	
 	socket.on('disconnect', function () {
 		console.log("server:got disconnect from ");
-    delete connections[socket.userId];    
+    // delete connections[socket.userId];    
     socket.broadcast.emit('someone-disconnected', { message: 'someone disconnected' });
   });
   
