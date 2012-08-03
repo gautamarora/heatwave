@@ -2,32 +2,35 @@ jQuery.noConflict();
 window.jxy = (function($){
   var self = {};
 
-  self.isAdmin = false;
+  var isAdmin = false;
 
-  self.clients = {};
+  var clients = {};
+  var socket = {};
+  var uid = '';
+  var heatmap = {};
 
   self.init = function(options) {
-    self.socket = io.connect(options.host + ':' + options.port);
-    self.uid = options.uid;
+    socket = io.connect(options.host + ':' + options.port);
+    uid = options.uid;
     if(options.role == 'client') {
-      self.initClient();
+      initClient();
     } else if(options.role == 'admin') {
-      self.initAdmin();
+      initAdmin();
     }
-    self.listenEvents();
+    listenEvents();
   };
 
-  self.initClient = function() {
-    self.socket.emit('init', {'uid' : self.uid, 'role' : 'client'});
+  var initClient = function() {
+    socket.emit('init', {'uid' : uid, 'role' : 'client'});
   };
 
-  self.initAdmin = function() {
-    self.socket.emit('init', {'uid' : self.uid, 'role' : 'admin'});
-    self.isAdmin = true;
-    self.drawOverlay();
+  var initAdmin = function() {
+    socket.emit('init', {'uid' : uid, 'role' : 'admin'});
+    isAdmin = true;
+    drawOverlay();
   };
 
-  self.drawOverlay = function() {
+  var drawOverlay = function() {
     if($('.jxy_overlay').length == 0) {
         var overlay = $('<div></div>').addClass('jxy_overlay');
         var overlay_inner = $('<div></div>').addClass('jxy_overlay_inner');
@@ -35,58 +38,54 @@ window.jxy = (function($){
         $(overlay).append(overlay_heatmap);
         $(overlay).append(overlay_inner);
         $('body').append(overlay);
-        self.initHeatmap();
+        initHeatmap();
     }   
   };
 
-  self.initHeatmap = function() {
-    self.heatmap = h337.create({'element' : $('.jxy_heatmap')[0], 'radius' : 25, 'visible' : true});
+  var initHeatmap = function() {
+    heatmap = h337.create({'element' : $('.jxy_heatmap')[0], 'radius' : 25, 'visible' : true});
   }
 
-  self.listenEvents = function() {
-    if(!self.isAdmin) {
-      self.socket.on('start', self.handleStart);
-      self.socket.on('end', self.handleEnd);
-      self.socket.on('disconnect', self.handleEnd);
-      self.socket.on('reconnect', function() {
-        self.initClient();
-      });
+  var listenEvents = function() {
+    if(!isAdmin) {
+      socket.on('start', handleStart);
+      socket.on('end', handleEnd);
+      socket.on('disconnect', handleEnd);
+      socket.on('reconnect', initClient);
     } else {
-      self.socket.on('moved', self.handleMove);
-      self.socket.on('reconnect', function() {
-        self.initAdmin();
-      });
+      socket.on('moved', handleMove);
+      socket.on('reconnect', initAdmin);
     }
   };
 
-  self.handleStart = function(data) {
+  var handleStart = function(data) {
     $(document).on('click', function(event) {
-      self.socket.emit('move', payload(event, true));
+      socket.emit('move', payload(event, true));
     });
     $(document).on('mousemove', function(event) {
-      self.socket.emit('move', payload(event, false));
+      socket.emit('move', payload(event, false));
     });
   };
 
-  self.handleEnd = function(data) {
+  var handleEnd = function(data) {
     $(document).off('click');
     $(document).off('mousemove');
   };
 
-  self.handleMove = function(data) {
+  var handleMove = function(data) {
     var move = getPosition(data.data);
     var user = data.who;
-    if(!(user.uid in self.clients)) {
+    if(!(user.uid in clients)) {
       var track = new Track(move.x, move.y, user.uid, user.uname, 'body', $);
-      self.clients[user.uid] = track;
+      clients[user.uid] = track;
     } else {
       if(move.c) {
-        self.clients[user.uid].click(move.x, move.y, $);
+        clients[user.uid].click(move.x, move.y, $);
       } else {
-        self.clients[user.uid].moveTo(move.x, move.y);
+        clients[user.uid].moveTo(move.x, move.y);
       }
     }
-    self.heatmap.store.addDataPoint(move.x, move.y);
+    heatmap.store.addDataPoint(move.x, move.y);
   };
 
   function getPosition(data) {
@@ -103,7 +102,7 @@ window.jxy = (function($){
       x : event.pageX,
       y : event.pageY,
       c : click,
-      u : self.uid,
+      u : uid,
       maxw : $(window).width()
     };
   }
