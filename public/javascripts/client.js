@@ -51,14 +51,16 @@ window.jxy = (function($){
   };
 
   self.handleMove = function(data) {
-    if(!(data.u in self.clients)) {
-      var track = new Track(data.x, data.y, data.u, 'Tester', 'body', $);
-      self.clients[data.u] = track;
+    var move = data.data;
+    var user = data.who;
+    if(!(user.uid in self.clients)) {
+      var track = new Track(move.x, move.y, user.uid, user.uname, 'body', $);
+      self.clients[user.uid] = track;
     } else {
-      if(data.c) {
-        self.clients[data.u].click(data.x, data.y, $);
+      if(move.c) {
+        self.clients[user.uid].click(move.x, move.y, $);
       } else {
-        self.clients[data.u].moveTo(data.x, data.y);
+        self.clients[user.uid].moveTo(move.x, move.y);
       }
     }
   };
