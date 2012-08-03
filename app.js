@@ -142,13 +142,13 @@ io.sockets.on('connection', function (socket) {
 							res.on('data', function(d) {
 								obj = JSON.parse(d);
 								console.log("userimage: ", obj.results.profile.profileimage);
-								socket.name = obj.results.profile.nickname;
+								socket.uname = obj.results.profile.nickname;
 								socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
 								
 								//save user info to db
 								var user = new User();
 								user.id = socket.uid;
-								user.name = socket.name;
+								user.name = socket.uname;
 								user.firstname = socket.fname;
 								user.lastname = socket.lname;
 								
@@ -203,7 +203,7 @@ io.sockets.on('connection', function (socket) {
 		move.y = data.y;
 		move.click = data.c;
 		
-		User.findOne({"id": 21116260}, function foundUser(err, user) {
+		User.findOne({"id": socket.uid}, function foundUser(err, user) {
 			move._user = user._id;
 			console.log("move" + move);
 			move.save(function(err) {
