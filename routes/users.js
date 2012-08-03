@@ -13,11 +13,12 @@ var User = require('../models/user')
           });
         });
 
-        // curl -v -H "Content-Type: application/json" -X POST -d '{"user":{"username":"gautam", "firstname":"Gautam", "lastname":"Arora"}}' http://localhost:3000/users
+        // curl -v -H "Content-Type: application/json" -X POST -d '{"user":{"id":"211126260","name":"gautam", "firstname":"Gautam", "lastname":"Arora"}}' http://192.168.110.137:3000/users
         app.post('/', function(req,res) {
           res.send('creating...');
           var user = new User();
-          user.username = req.body.user.username;
+          user.id = req.body.user.id;
+          user.name = req.body.user.name;
           user.firstname = req.body.user.firstname;
           user.lastname = req.body.user.lastname;
 

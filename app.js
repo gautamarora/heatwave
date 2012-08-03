@@ -24,6 +24,7 @@ mongoose              = require('mongoose');
 Schema                = mongoose.Schema;
 ObjectId              = mongoose.SchemaTypes.ObjectId;
 User 									= mongoose.model('User', require('./models/user'));
+Move 									= mongoose.model('Move', require('./models/move'));
 var db = mongoose.connect(conf.mongo.url[env]+conf.mongo.dbname[env], function(err) { if (err) { throw err; } });
 
 var app = express();
@@ -57,8 +58,8 @@ server = http.createServer(app).listen(app.get('port'), function(){
 //global socket.io
 io = require('socket.io').listen(server);
 
-users = [];
-sessions = [];
+// users = [];
+// sessions = [];
 adminSocketId = '';
 // var parseCookie = require('connect').utils.parseCookie;
 // io.set('authorization', function (data, accept) {
@@ -74,7 +75,7 @@ adminSocketId = '';
 // io.enable('browser client minification');  // send minified client
 // io.enable('browser client etag');          // apply etag caching logic based on version number
 // io.enable('browser client gzip');          // gzip the file
-// io.set('log level', 1);                    // reduce logging
+io.set('log level', 1);                    // reduce logging
 // io.set('transports', [                     // enable all transports (optional if you want flashsocket)
 //     'websocket'
 //   , 'flashsocket'
@@ -87,7 +88,7 @@ adminSocketId = '';
 io.sockets.on('connection', function (socket) {
 	
 	var socketId = socket.id
-    , sessionId = socket.handshake.sessionID;
+    // , sessionId = socket.handshake.sessionID;
   
 	console.log("server:got connection from " + socket.id);
   // if(!(_.contains(sessions, sessionId))) {
@@ -105,28 +106,113 @@ io.sockets.on('connection', function (socket) {
   });
   
 	socket.on('init', function(data) {
-		
+		console.log("server:got init" + data.role);
 		socket.uid = data.uid;
 		socket.role = data.role;
 		
 		//TODO KAM hit API and get the name, image
-		socket.uname = data.uid;
-		socket.uimg = '';
-				
-		if(data.role === 'admin') {
-			console.log("server:admin is in the house");
-			adminSocketId = socket.id;
-		} else {
-			console.log("server:we have a new client");
-			socket.emit('start', { message: 'you can start now' });
-		}
+		var optionsgetUserName = {
+			host : 'api.corporateperks.com', // here only the domain name
+			port : 80,
+			path : '/user/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
+			method : 'GET' // do GET
+		};
+
+		var optionsgetUserImage = {
+			host : 'api.corporateperks.com', // here only the domain name
+			port : 80,
+			path : '/profile/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
+			method : 'GET' // do GET
+		};
+		User.findOne({"id": socket.uid}, function foundUser(err, user) {
+			if(!user) {
+				console.log("server:we have a client with no user info")
+				// get user name
+				var reqGetUserName = http.request(optionsgetUserName, function(res) {
+					console.log("statusCode: ", res.statusCode);
+					res.on('data', function(d) {
+						obj = JSON.parse(d);
+						console.log("firstname: ", obj.results.user.firstName);
+						socket.fname = obj.results.user.firstName;
+						socket.lname = obj.results.user.lastName;
+						
+						//now get user image
+						var reqGetUserImage = http.request(optionsgetUserImage, function(res) {
+							console.log("statusCode: ", res.statusCode);
+							res.on('data', function(d) {
+								obj = JSON.parse(d);
+								console.log("userimage: ", obj.results.profile.profileimage);
+								socket.name = obj.results.profile.nickname;
+								socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
+								
+								//save user info to db
+								var user = new User();
+								user.id = socket.uid;
+								user.name = socket.name;
+								user.firstname = socket.fname;
+								user.lastname = socket.lname;
+								
+								user.save(function(err) {
+					        if (!err) {
+					          console.log("user saved");
+										if(data.role === 'admin') {
+											console.log("server:admin is in the house");
+											adminSocketId = socket.id;
+										} else {
+											console.log("server:we have a new client");
+											socket.emit('start', { message: 'you can start now' });
+										}
+					        } else {
+					          return console.log(err);
+					        }
+					      });
+							});
+						});
+						reqGetUserImage.end();
+						reqGetUserImage.on('error', function(e) {
+							console.error(e);
+						});
+					});
+				});
+				reqGetUserName.end();
+				reqGetUserName.on('error', function(e) {
+					console.error(e);
+				});
+			} else {
+				console.log("server:we have a client and his user info is right here " + user);
+				if(data.role === 'admin') {
+					console.log("server:admin is in the house");
+					adminSocketId = socket.id;
+				} else {
+					console.log("server:we have a new client");
+					socket.emit('start', { message: 'you can start now' });
+				}
+			}
+		});		
 	});
 	
 	socket.on('move', function(data) {
 		console.log("server: moved " + socket.uname);
+		
 		if(adminSocketId) {
-			io.sockets.socket(adminSocketId).emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname}});
+			io.sockets.socket(adminSocketId).emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
 		}
+
+		var move = new Move();
+		move.x = data.x;
+		move.y = data.y;
+		move.click = data.c;
+		
+		User.findOne({"id": 21116260}, function foundUser(err, user) {
+			move._user = user._id;
+			console.log("move" + move);
+			move.save(function(err) {
+        if (!err) {
+          return console.log("move saved");
+        } else {
+          return console.log(err);
+        }
+      });  
+	   });
 	});
-	
 });
