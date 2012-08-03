@@ -105,6 +105,14 @@ io.sockets.on('connection', function (socket) {
   });
   
 	socket.on('init', function(data) {
+		
+		socket.uid = data.uid;
+		socket.role = data.role;
+		
+		//TODO KAM hit API and get the name, image
+		socket.uname = data.uid;
+		socket.uimg = '';
+				
 		if(data.role === 'admin') {
 			console.log("server:admin is in the house");
 			adminSocketId = socket.id;
@@ -115,8 +123,9 @@ io.sockets.on('connection', function (socket) {
 	});
 	
 	socket.on('move', function(data) {
+		console.log("server: moved " + socket.uname);
 		if(adminSocketId) {
-			io.sockets.socket(adminSocketId).emit('moved', data);
+			io.sockets.socket(adminSocketId).emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname}});
 		}
 	});
 	
