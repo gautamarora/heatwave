@@ -57,10 +57,46 @@ server = http.createServer(app).listen(app.get('port'), function(){
 //global socket.io
 io = require('socket.io').listen(server);
 
+users = [];
+sessions = [];
+adminSocketId = '';
+// var parseCookie = require('connect').utils.parseCookie;
+// io.set('authorization', function (data, accept) {
+//     if (data.headers.cookie) {
+//         data.cookie = parseCookie(data.headers.cookie);
+//         
+//         data.sessionID = data.cookie['connect.sid'];
+//     } else {
+//        return accept('No cookie transmitted.', false);
+//     }
+//     accept(null, true);
+// });
+// io.enable('browser client minification');  // send minified client
+// io.enable('browser client etag');          // apply etag caching logic based on version number
+// io.enable('browser client gzip');          // gzip the file
+// io.set('log level', 1);                    // reduce logging
+// io.set('transports', [                     // enable all transports (optional if you want flashsocket)
+//     'websocket'
+//   , 'flashsocket'
+//   , 'htmlfile'
+//   , 'xhr-polling'
+//   , 'jsonp-polling'
+// ]);
+
 
 io.sockets.on('connection', function (socket) {
+	
+	var socketId = socket.id
+    , sessionId = socket.handshake.sessionID;
+  
 	console.log("server:got connection from " + socket.id);
-	socket.emit('connected', { message: 'you connected' });
+  // if(!(_.contains(sessions, sessionId))) {
+  //   sessions.push(sessionId);
+  //   socket.emit('connected', { socketId: socketId, sessionId: socket.handshake.sessionID });
+  //   socket.broadcast.emit('someone-connected', { socketId: socketId, sessionId: socket.handshake.sessionID });
+  // } else {
+  //   socket.emit('connected', { socketId: socketId, sessionId: socket.handshake.sessionID });
+  // }
 	
 	socket.on('disconnect', function () {
 		console.log("server:got disconnect from ");
@@ -69,11 +105,19 @@ io.sockets.on('connection', function (socket) {
   });
   
 	socket.on('init', function(data) {
-		socket.emit('start', { message: 'you connected' }); //to client if role != admin, else say nothing
+		if(data.role === 'admin') {
+			console.log("server:admin is in the house");
+			adminSocketId = socket.id;
+		} else {
+			console.log("server:we have a new client");
+			socket.emit('start', { message: 'you can start now' });
+		}
 	});
 	
 	socket.on('move', function(data) {
-		socket.emit('moved', { message: 'someone moved' }); //to admin only
+		if(adminSocketId) {
+			io.sockets.socket(adminSocketId).emit('moved', data);
+		}
 	});
 	
 });
