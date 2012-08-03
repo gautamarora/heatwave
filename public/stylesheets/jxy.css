@@ -1,0 +1,61 @@
+.jxy_track {
+	width:10px;
+	height:10px;
+	border:1px solid #DDD;
+	position:absolute;
+	z-index:1020;
+}
+
+@-webkit-keyframes click_expand {
+	0% {
+		opacity:1;
+		border-radius:2px;
+		height:4px;
+		width:4px;
+		margin:48px;
+	}
+	99% {
+		opacity:0;
+		border-radius:50px;
+		height:100px;
+		width:100px;
+		margin:0px;
+	}
+	100% {
+		opacity:0;
+		border-radius:0;
+		border-width:0;
+		height:0;
+		width:0;
+		margin:0px;
+	}
+}
+
+.jxy_click {
+	width:100px;
+	height:100px;
+	position:absolute;
+	z-index:1010;
+}
+
+.jxy_click_inner {
+	-webkit-animation:click_expand 2s;
+	background:#FFFB9D;
+}
+
+.jxy_overlay {
+	position:fixed;
+	width:100%;
+	height:100%;
+	top:0;
+	left:0;
+	z-index:1000;
+}
+
+.jxy_overlay_inner {
+	position:fixed;
+	width:100%;
+	height:100%;
+	background:black;
+	opacity:0.5;
+}

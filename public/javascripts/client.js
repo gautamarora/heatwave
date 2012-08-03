@@ -24,7 +24,15 @@ window.jxy = (function($){
   self.initAdmin = function() {
     self.socket.emit('init', {'uid' : self.uid, 'role' : 'admin'});
     self.isAdmin = true;
+    self.drawOverlay();
     self.listenEvents();
+  };
+
+  self.drawOverlay = function() {
+    var overlay = $('<div></div>').addClass('jxy_overlay');
+    var overlay_inner = $('<div></div>').addClass('jxy_overlay_inner');
+    $(overlay).append(overlay_inner);
+    $('body').append(overlay);
   };
 
   self.listenEvents = function() {
@@ -51,7 +59,7 @@ window.jxy = (function($){
   };
 
   self.handleMove = function(data) {
-    var move = data.data;
+    var move = getPosition(data.data);
     var user = data.who;
     if(!(user.uid in self.clients)) {
       var track = new Track(move.x, move.y, user.uid, user.uname, 'body', $);
@@ -65,12 +73,22 @@ window.jxy = (function($){
     }
   };
 
+  function getPosition(data) {
+    var x = data.x;
+    var clientMax = data.maxw;
+    var adminMax = $(window).width();
+    var diff = Math.abs(adminMax - clientMax) / 2 * (adminMax > clientMax ? 1 : -1);
+    data.x = x + diff;
+    return data;
+  }
+
   function payload(event, click) {
     return {
       x : event.pageX,
       y : event.pageY,
       c : click,
-      u : self.uid
+      u : self.uid,
+      maxw : $(window).width()
     };
   }
 
