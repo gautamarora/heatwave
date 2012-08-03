@@ -14,34 +14,48 @@ window.jxy = (function($){
     } else if(options.role == 'admin') {
       self.initAdmin();
     }
+    self.listenEvents();
   };
 
   self.initClient = function() {
     self.socket.emit('init', {'uid' : self.uid, 'role' : 'client'});
-    self.listenEvents();    
   };
 
   self.initAdmin = function() {
     self.socket.emit('init', {'uid' : self.uid, 'role' : 'admin'});
     self.isAdmin = true;
     self.drawOverlay();
-    self.listenEvents();
   };
 
   self.drawOverlay = function() {
-    var overlay = $('<div></div>').addClass('jxy_overlay');
-    var overlay_inner = $('<div></div>').addClass('jxy_overlay_inner');
-    $(overlay).append(overlay_inner);
-    $('body').append(overlay);
+    if($('.jxy_overlay').length == 0) {
+        var overlay = $('<div></div>').addClass('jxy_overlay');
+        var overlay_inner = $('<div></div>').addClass('jxy_overlay_inner');
+        var overlay_heatmap = $('<div></div>').addClass('jxy_heatmap');
+        $(overlay).append(overlay_heatmap);
+        $(overlay).append(overlay_inner);
+        $('body').append(overlay);
+        self.initHeatmap();
+    }   
   };
 
+  self.initHeatmap = function() {
+    self.heatmap = h337.create({'element' : $('.jxy_heatmap')[0], 'radius' : 25, 'visible' : true});
+  }
+
   self.listenEvents = function() {
-		console.log("i am now listening as admin:" + self.isAdmin);
     if(!self.isAdmin) {
       self.socket.on('start', self.handleStart);
       self.socket.on('end', self.handleEnd);
+      self.socket.on('disconnect', self.handleEnd);
+      self.socket.on('reconnect', function() {
+        self.initClient();
+      });
     } else {
       self.socket.on('moved', self.handleMove);
+      self.socket.on('reconnect', function() {
+        self.initAdmin();
+      });
     }
   };
 
@@ -72,6 +86,7 @@ window.jxy = (function($){
         self.clients[user.uid].moveTo(move.x, move.y);
       }
     }
+    self.heatmap.store.addDataPoint(move.x, move.y);
   };
 
   function getPosition(data) {

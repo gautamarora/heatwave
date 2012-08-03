@@ -5,7 +5,13 @@ function Track(x, y, uid, name, container, $) {
 	this.name = name;
 
 	this.element = $('<div></div>').addClass('jxy_track');
-	this.element.css({'left' : this.x, 'top' : this.y, 'background': '#'+Math.floor(Math.random()*16777215).toString(16)});
+	this.element.html("&#9650;");
+	this.element.css({'left' : this.x, 'top' : this.y});
+	
+	var nameDisplay = $('<div></div>').addClass('jxy_name');
+	nameDisplay.html(name);
+	this.element.append(nameDisplay);
+
 	this.container = container;
 	$(container).append(this.element);
 }

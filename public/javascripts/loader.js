@@ -7,7 +7,9 @@ var jxyloader = (function() {
 				createScript("http://192.168.110.172:3000/socket.io/socket.io.js", function() {
 					createScript("http://192.168.110.172:3000/javascripts/client.js", function() {
 						createScript("http://192.168.110.172:3000/javascripts/Track.js", function() {
-							callback();
+							createScript("http://192.168.110.172:3000/javascripts/heatmap.js", function() {
+								callback();
+							});
 						});
 					});
 				});

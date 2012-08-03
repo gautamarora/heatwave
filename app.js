@@ -169,10 +169,6 @@ io.sockets.on('connection', function (socket) {
 					      });
 							});
 						});
-						reqGetUserImage.end();
-						reqGetUserImage.on('error', function(e) {
-							console.error(e);
-						});
 					});
 				});
 				reqGetUserName.end();
@@ -190,11 +186,17 @@ io.sockets.on('connection', function (socket) {
 					console.log("server:admin is in the house");
 					adminSocketId = socket.id;
 				} else {
+					socket.uname = user.name;
+					socket.fname = user.firstname;
+					socket.lname = user.lastname;
+					socket.uimg = '';
+
+					console.log("server:we have a client and his user info is right here " + user);
 					console.log("server:we have a new client");
 					socket.emit('start', { message: 'you can start now' });
 				}
-			}
-		});		
+			});
+		}		
 	});
 	
 	socket.on('move', function(data) {
