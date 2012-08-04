@@ -151,6 +151,7 @@ io.sockets.on('connection', function (socket) {
 								user.name = socket.uname;
 								user.firstname = socket.fname;
 								user.lastname = socket.lname;
+								user.image = socket.uimg;
 								
 								user.save(function(err) {
 					        if (!err) {
@@ -182,7 +183,7 @@ io.sockets.on('connection', function (socket) {
 				socket.uname = user.name;
 				socket.fname = user.firstname;
 				socket.lname = user.lastname;
-				socket.uimg = '';
+				socket.uimg = user.image;
 
 				console.log("server:we have a client and his user info is right here " + user);
 				if(data.role === 'admin') {
@@ -212,9 +213,11 @@ io.sockets.on('connection', function (socket) {
 		move.x = data.x;
 		move.y = data.y;
 		move.click = data.c;
+		move.sid = socket.id;
 		
 		User.findOne({"id": socket.uid}, function foundUser(err, user) {
 			move._user = user._id;
+			move.uid = user.id;
 			// console.log("move" + move);
 			move.save(function(err) {
         if (!err) {

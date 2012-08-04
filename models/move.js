@@ -7,7 +7,9 @@ var MoveSchema = new Schema({
   ,	y: { type: Number, required: true }
 	, click: { type: Boolean }
   , _user : { type: Schema.ObjectId, ref: 'User', required: true }
-  , page: String
+  , uid : { type: Number, required: true }
+  , sid : { type: String, required: true }
+  , page: { type: String } 
   , date: { type: Date, default: Date.now }
 });
 
