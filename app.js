@@ -111,8 +111,52 @@ io.sockets.on('connection', function (socket) {
 		socket.role = data.role;
 		
 		//TODO KAM hit API and get the name, image
-		socket.uname = data.uid;
-		socket.uimg = '';
+		var optionsget = {
+			host : 'api.corporateperks.com', // here only the domain name
+			port : 80,
+			path : '/user/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
+			method : 'GET' // do GET
+		};
+
+		// do the GET request
+		var reqGet = http.request(optionsget, function(res) {
+			console.log("statusCode: ", res.statusCode);
+			res.on('data', function(d) {
+				//console.info('GET result:\n');
+				//process.stdout.write(d);
+				obj = JSON.parse(d);
+				socket.uname = obj.results.user.firstName;
+			});
+		});
+
+		reqGet.end();
+		reqGet.on('error', function(e) {
+			console.error(e);
+		});
+
+		var optionsget = {
+			host : 'api.corporateperks.com', // here only the domain name
+			port : 80,
+			path : '/profile/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
+			method : 'GET' // do GET
+		};
+
+		// do the GET request
+		var reqGet = http.request(optionsget, function(res) {
+			console.log("statusCode: ", res.statusCode);
+			res.on('data', function(d) {
+				//console.info('GET result:\n');
+				//process.stdout.write(d);
+				obj = JSON.parse(d);
+				socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
+			});
+		});
+
+		reqGet.end();
+		reqGet.on('error', function(e) {
+			console.error(e);
+		});
+	
 		
 		User.findOne({"id": 21116260}, function foundUser(err, user) {
 			if(!user) {
@@ -138,7 +182,7 @@ io.sockets.on('connection', function (socket) {
 		console.log("server: moved " + socket.uname);
 		
 		if(adminSocketId) {
-			io.sockets.socket(adminSocketId).emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname}});
+			io.sockets.socket(adminSocketId).emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
 		}
 
 		var move = new Move();
