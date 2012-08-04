@@ -106,76 +106,89 @@ io.sockets.on('connection', function (socket) {
   });
   
 	socket.on('init', function(data) {
-		console.log("server:got init");
+		console.log("server:got init" + data.role);
 		socket.uid = data.uid;
 		socket.role = data.role;
 		
 		//TODO KAM hit API and get the name, image
-		var optionsget = {
+		var optionsgetUserName = {
 			host : 'api.corporateperks.com', // here only the domain name
 			port : 80,
 			path : '/user/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
 			method : 'GET' // do GET
 		};
 
-		// do the GET request
-		var reqGet = http.request(optionsget, function(res) {
-			console.log("statusCode: ", res.statusCode);
-			res.on('data', function(d) {
-				//console.info('GET result:\n');
-				//process.stdout.write(d);
-				obj = JSON.parse(d);
-				socket.uname = obj.results.user.firstName;
-			});
-		});
-
-		reqGet.end();
-		reqGet.on('error', function(e) {
-			console.error(e);
-		});
-
-		var optionsget = {
+		var optionsgetUserImage = {
 			host : 'api.corporateperks.com', // here only the domain name
 			port : 80,
 			path : '/profile/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
 			method : 'GET' // do GET
 		};
-
-		// do the GET request
-		var reqGet = http.request(optionsget, function(res) {
-			console.log("statusCode: ", res.statusCode);
-			res.on('data', function(d) {
-				//console.info('GET result:\n');
-				//process.stdout.write(d);
-				obj = JSON.parse(d);
-				socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
-			});
-		});
-
-		reqGet.end();
-		reqGet.on('error', function(e) {
-			console.error(e);
-		});
-	
-		
-		User.findOne({"id": 21116260}, function foundUser(err, user) {
+		User.findOne({"id": socket.uid}, function foundUser(err, user) {
 			if(!user) {
 				console.log("server:we have a client with no user info")
-				//TODO KAM hit api, get user details
-				//TODO GA save user details
+				// get user name
+				var reqGetUserName = http.request(optionsgetUserName, function(res) {
+					console.log("statusCode: ", res.statusCode);
+					res.on('data', function(d) {
+						obj = JSON.parse(d);
+						console.log("firstname: ", obj.results.user.firstName);
+						socket.fname = obj.results.user.firstName;
+						socket.lname = obj.results.user.lastName;
+						
+						//now get user image
+						var reqGetUserImage = http.request(optionsgetUserImage, function(res) {
+							console.log("statusCode: ", res.statusCode);
+							res.on('data', function(d) {
+								obj = JSON.parse(d);
+								console.log("userimage: ", obj.results.profile.profileimage);
+								socket.name = obj.results.profile.nickname;
+								socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
+								
+								//save user info to db
+								var user = new User();
+								user.id = socket.uid;
+								user.name = socket.name;
+								user.firstname = socket.fname;
+								user.lastname = socket.lname;
+								
+								user.save(function(err) {
+					        if (!err) {
+					          console.log("user saved");
+										if(data.role === 'admin') {
+											console.log("server:admin is in the house");
+											adminSocketId = socket.id;
+										} else {
+											console.log("server:we have a new client");
+											socket.emit('start', { message: 'you can start now' });
+										}
+					        } else {
+					          return console.log(err);
+					        }
+					      });
+							});
+						});
+						reqGetUserImage.end();
+						reqGetUserImage.on('error', function(e) {
+							console.error(e);
+						});
+					});
+				});
+				reqGetUserName.end();
+				reqGetUserName.on('error', function(e) {
+					console.error(e);
+				});
 			} else {
 				console.log("server:we have a client and his user info is right here " + user);
+				if(data.role === 'admin') {
+					console.log("server:admin is in the house");
+					adminSocketId = socket.id;
+				} else {
+					console.log("server:we have a new client");
+					socket.emit('start', { message: 'you can start now' });
+				}
 			}
-		});
-		
-		
-		if(data.role === 'admin') {
-			console.log("server:admin is in the house");
-			adminSocketId = socket.id;
-		} else {
-			console.log("server:we have a new client");
-			socket.emit('start', { message: 'you can start now' });
-		}
+		});		
 	});
 	
 	socket.on('move', function(data) {
