@@ -229,4 +229,27 @@ io.sockets.on('connection', function (socket) {
       });  
        });
     });
+
+    socket.on('getinsights', function(data) {
+        var insights = {max: 200, data: [
+            {x: 100, y: 100, count: 80},
+            {x: 120, y: 120, count: 60},
+            {x: 100, y: 80, count: 90},
+            {x: 111, y: 110, count: 60},
+            {x: 201, y: 150, count: 90},
+            {x: 201, y: 900, count: 90},
+            {x: 600, y: 1050, count: 90},
+            {x: 250, y: 150, count: 90},
+            {x: 800, y: 800, count: 90},
+            {x: 1000, y: 1000, count: 90},
+            {x: 0, y: 0, count: 90},
+            {x: 311, y: 110, count: 60},
+            {x: 121, y: 510, count: 70},
+            {x: 511, y: 110, count: 200},
+            {x: 211, y: 110, count: 50},
+            {x: 191, y: 110, count: 20},
+            {x: 511, y: 110, count: 40}
+            ]};
+        socket.emit('sendinsights', insights); 
+    });
 });
