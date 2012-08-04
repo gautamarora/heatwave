@@ -25,6 +25,7 @@ Schema                = mongoose.Schema;
 ObjectId              = mongoose.SchemaTypes.ObjectId;
 User                                    = mongoose.model('User', require('./models/user'));
 Move                                    = mongoose.model('Move', require('./models/move'));
+Metric 								= mongoose.model('Metric', require('./models/metric'));
 var db = mongoose.connect(conf.mongo.url[env]+conf.mongo.dbname[env], function(err) { if (err) { throw err; } });
 
 var app = express();
@@ -220,36 +221,53 @@ io.sockets.on('connection', function (socket) {
             move._user = user._id;
             move.uid = user.id;
             // console.log("move" + move);
-            move.save(function(err) {
-        if (!err) {
-          return console.log("move saved");
-        } else {
-          return console.log(err);
-        }
-      });  
+						move.save(function(err) {
+						  if (!err) {
+						    console.log("move saved");
+								//update metric
+								var metric = new Metric();
+								metric.x = Math.round(data.x/10);
+								metric.y = Math.round(data.y/10);
+								var count =  data.c ? 5 : 1;
+								Metric.update({page: 'home', x: metric.x, y: metric.y}, {$inc: { 'count': count }}, {upsert: true}, function(err, metric_updated){
+									if(err) { throw err; }
+						    	return console.log("move metric saved");
+								});
+						  } else {
+						    return console.log(err);
+						  }
+						});  
        });
     });
 
-    socket.on('getinsights', function(data) {
-        var insights = {max: 200, data: [
-            {x: 100, y: 100, count: 80},
-            {x: 120, y: 120, count: 60},
-            {x: 100, y: 80, count: 90},
-            {x: 111, y: 110, count: 60},
-            {x: 201, y: 150, count: 90},
-            {x: 201, y: 900, count: 90},
-            {x: 600, y: 1050, count: 90},
-            {x: 250, y: 150, count: 90},
-            {x: 800, y: 800, count: 90},
-            {x: 1000, y: 1000, count: 90},
-            {x: 0, y: 0, count: 90},
-            {x: 311, y: 110, count: 60},
-            {x: 121, y: 510, count: 70},
-            {x: 511, y: 110, count: 200},
-            {x: 211, y: 110, count: 50},
-            {x: 191, y: 110, count: 20},
-            {x: 511, y: 110, count: 40}
-            ]};
-        socket.emit('sendinsights', insights); 
+    socket.on('move', function(data) {
+				var metrics = Metric
+											.find({page: 'home'})
+											.sort('count', -1)
+											.exec(function(err, insights) {
+												// console.log("insights",insights[0].count);
+												// console.log(insights);
+												socket.emit('sendinsights', {max: insights[0].count, data: insights}); 
+				});
+        // var insights = {max: 200, data: [
+        //     {x: 100, y: 100, count: 80},
+        //     {x: 120, y: 120, count: 60},
+        //     {x: 100, y: 80, count: 90},
+        //     {x: 111, y: 110, count: 60},
+        //     {x: 201, y: 150, count: 90},
+        //     {x: 201, y: 900, count: 90},
+        //     {x: 600, y: 1050, count: 90},
+        //     {x: 250, y: 150, count: 90},
+        //     {x: 800, y: 800, count: 90},
+        //     {x: 1000, y: 1000, count: 90},
+        //     {x: 0, y: 0, count: 90},
+        //     {x: 311, y: 110, count: 60},
+        //     {x: 121, y: 510, count: 70},
+        //     {x: 511, y: 110, count: 200},
+        //     {x: 211, y: 110, count: 50},
+        //     {x: 191, y: 110, count: 20},
+        //     {x: 511, y: 110, count: 40}
+        //     ]};
+        // socket.emit('sendinsights', insights); 
     });
 });
