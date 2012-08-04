@@ -36,6 +36,7 @@ window.jxy = (function($){
   };
 
   self.listenEvents = function() {
+		console.log("i am now listening as admin:" + self.isAdmin);
     if(!self.isAdmin) {
       self.socket.on('start', self.handleStart);
       self.socket.on('end', self.handleEnd);

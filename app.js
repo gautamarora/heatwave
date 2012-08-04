@@ -197,7 +197,12 @@ io.sockets.on('connection', function (socket) {
 	});
 	
 	socket.on('move', function(data) {
-		console.log("server: moved " + socket.uname);
+		console.log("someone is on the move...");
+		if(socket.uname == undefined) {
+			console.log("ERROR:socket.uname is undefined --> uid",socket.uid)
+		} else {
+			console.log("server: moved " + socket.uname);
+		}
 		
 		if(adminSocketId) {
 			io.sockets.socket(adminSocketId).emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
@@ -210,7 +215,7 @@ io.sockets.on('connection', function (socket) {
 		
 		User.findOne({"id": socket.uid}, function foundUser(err, user) {
 			move._user = user._id;
-			console.log("move" + move);
+			// console.log("move" + move);
 			move.save(function(err) {
         if (!err) {
           return console.log("move saved");
