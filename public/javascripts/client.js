@@ -4,6 +4,8 @@ window.jxy = (function($){
 
   self.isAdmin = false;
 
+  self.clients = {};
+
   self.init = function(options) {
     self.socket = io.connect(options.host + ':' + options.port);
     self.uid = options.uid;
@@ -49,14 +51,24 @@ window.jxy = (function($){
   };
 
   self.handleMove = function(data) {
-    console.log(data);
+    if(!(data.u in self.clients)) {
+      var track = new Track(data.x, data.y, data.u, 'Tester', 'body', $);
+      self.clients[data.u] = track;
+    } else {
+      if(data.c) {
+        self.clients[data.u].click(data.x, data.y, $);
+      } else {
+        self.clients[data.u].moveTo(data.x, data.y);
+      }
+    }
   };
 
   function payload(event, click) {
     return {
-      x : event.offsetX,
-      y : event.offsetY,
-      c : click
+      x : event.pageX,
+      y : event.pageY,
+      c : click,
+      u : self.uid
     };
   }
 
