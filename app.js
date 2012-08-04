@@ -226,8 +226,8 @@ io.sockets.on('connection', function (socket) {
 						    console.log("move saved");
 								//update metric
 								var metric = new Metric();
-								metric.x = Math.round(data.x/10);
-								metric.y = Math.round(data.y/10);
+								metric.x = (Math.round(data.x/10) * 10) + 5;
+								metric.y = (Math.round(data.y/10) * 10) + 5;
 								var count =  data.c ? 5 : 1;
 								Metric.update({page: 'home', x: metric.x, y: metric.y}, {$inc: { 'count': count }}, {upsert: true}, function(err, metric_updated){
 									if(err) { throw err; }
@@ -247,6 +247,7 @@ io.sockets.on('connection', function (socket) {
 											.exec(function(err, insights) {
 												// console.log("insights",insights[0].count);
 												// console.log(insights);
+												if(insights != undefined && insights[0] != undefined)
 												socket.emit('sendinsights', {max: insights[0].count, data: insights}); 
 				});
         // var insights = {max: 200, data: [
