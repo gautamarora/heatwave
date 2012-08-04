@@ -3,10 +3,10 @@ var mongoose          = require('mongoose')
   , ObjectId          = mongoose.SchemaTypes.ObjectId;
 
 var UserSchema = new Schema({
-	id: { type: Number, required: true }
+	id: { type: Number }
+	, name: { type: String } 
   , firstname: String
   , lastname: String
-	, nickname: { type: String, required: true } 
 });
 
 module.exports = mongoose.model('User', UserSchema);
