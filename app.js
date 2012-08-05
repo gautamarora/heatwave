@@ -229,7 +229,7 @@ io.sockets.on('connection', function (socket) {
 								var metric = new Metric();
 								metric.x = (Math.round(data.x/10) * 10) + 5;
 								metric.y = (Math.round(data.y/10) * 10) + 5;
-								var count =  data.c ? 5 : 1;
+								var count =  data.c ? 100 : 1;
 								Metric.update({page: 'home', x: metric.x, y: metric.y}, {$inc: { 'count': count }}, {upsert: true}, function(err, metric_updated){
 									if(err) { throw err; }
 						    	return console.log("move metric saved");

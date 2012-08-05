@@ -28,15 +28,33 @@ window.jxy = (function($){
     }     
   };
 
+  var showLoader = function() {
+    if($('.jxy_loader').length == 0) {
+        var loader = $('<div></div>').addClass('jxy_loader');
+        var inner = $('<div></div>').addClass('jxy_loader_inner');
+        $(loader).append(inner);
+        $('body').append(loader);
+    } else {
+        $('.jxy_loader').show();
+    }
+  };
+
+  var hideLoader = function() {
+    $('.jxy_loader').hide();
+  };
+
   var showInsights = function() {
+    showLoader();
     socket.emit('getinsights', {});
     socket.on('sendinsights', handleInsightsReceieve);
+    $('.jxy_track, .jxy_static_click').hide();
   };
 
   var hideInsights = function() {
     if(showingInsights) {
         showingInsights = false;     
         heatmap.store.setDataSet({max:0, data:{}});
+        $('.jxy_track, .jxy_static_click').show();
     }
   }
 
@@ -44,6 +62,7 @@ window.jxy = (function($){
     showingInsights = true;
     createHeatmap();
     heatmap.store.setDataSet(data);
+    hideLoader();
   };
 
   var initClient = function() {
@@ -90,7 +109,7 @@ window.jxy = (function($){
             divWithClass('jxy_toggle').append(
                 $('<input></input>').attr('type', 'checkbox').attr('id', 'jxy_toggle_map')));
     adminBarSections[3] = divWithClass('jxy_admin_bar_count jxy_admin_bar_section').append(
-        divWithClass('jxy_admin_bar_count_label').html('Count:')).append( 
+        divWithClass('jxy_admin_bar_count_label').html('Users:')).append( 
         divWithClass('jxy_admin_bar_count_number').attr('id', 'jxy_admin_bar_count').html(0));
     adminBarSections[4] = divWithClass('jxy_admin_bar_insights jxy_admin_bar_section jxy_admin_bar_section_nopad jxy_admin_bar_section_last').append(divWithClass('jxy_logo jxy_glass_logo'));
     adminBarSections[4].append(divWithClass('jxy_admin_bar_insights_text').html('Show Insights').click(handleInsightClick));
@@ -103,12 +122,15 @@ window.jxy = (function($){
 
   var handleToggleChange = function(elem, value) {
     if(elem.attr('id') == 'jxy_toggle_map') {
+        if(realtimeHeatmap) {
+            heatmap.store.setDataSet({max:0, data:{}});
+        }
         realtimeHeatmap = !realtimeHeatmap;
     } else {
         if(value) {
-            $('.jxy_overlay_inner, .jxy_heatmap').show();
+            $('.jxy_overlay_inner, .jxy_heatmap, .jxy_static_click').show();
         } else {
-            $('.jxy_overlay_inner, .jxy_heatmap').hide();
+            $('.jxy_overlay_inner, .jxy_heatmap, .jxy_static_click').hide();
         }
     }
   }
@@ -181,6 +203,8 @@ window.jxy = (function($){
     if(data.who.uid in clients) {
         clients[data.who.uid].remove($);
         delete clients[data.who.uid];
+        clientCount -= 1;
+        $('#jxy_admin_bar_count').html(clientCount);
     }
   };
 
