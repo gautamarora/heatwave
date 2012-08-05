@@ -102,8 +102,9 @@ io.sockets.on('connection', function (socket) {
     
     socket.on('disconnect', function () {
         console.log("server:got disconnect from ");
-    // delete connections[socket.userId];    
-    socket.broadcast.emit('someone-disconnected', { message: 'someone disconnected' });
+        if(adminSocketId) {
+            io.sockets.socket(adminSocketId).emit('disconnected', {who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
+        }
   });
   
     socket.on('init', function(data) {
@@ -240,35 +241,16 @@ io.sockets.on('connection', function (socket) {
        });
     });
 
-    socket.on('move', function(data) {
-				var metrics = Metric
-											.find({page: 'home'})
-											.sort('count', -1)
-											.exec(function(err, insights) {
-												// console.log("insights",insights[0].count);
-												// console.log(insights);
-												if(insights != undefined && insights[0] != undefined)
-												socket.emit('sendinsights', {max: insights[0].count, data: insights}); 
-				});
-        // var insights = {max: 200, data: [
-        //     {x: 100, y: 100, count: 80},
-        //     {x: 120, y: 120, count: 60},
-        //     {x: 100, y: 80, count: 90},
-        //     {x: 111, y: 110, count: 60},
-        //     {x: 201, y: 150, count: 90},
-        //     {x: 201, y: 900, count: 90},
-        //     {x: 600, y: 1050, count: 90},
-        //     {x: 250, y: 150, count: 90},
-        //     {x: 800, y: 800, count: 90},
-        //     {x: 1000, y: 1000, count: 90},
-        //     {x: 0, y: 0, count: 90},
-        //     {x: 311, y: 110, count: 60},
-        //     {x: 121, y: 510, count: 70},
-        //     {x: 511, y: 110, count: 200},
-        //     {x: 211, y: 110, count: 50},
-        //     {x: 191, y: 110, count: 20},
-        //     {x: 511, y: 110, count: 40}
-        //     ]};
-        // socket.emit('sendinsights', insights); 
+    socket.on('getinsights', function(data) {
+    	var metrics = Metric
+			.find({page: 'home'})
+			.sort('count', -1)
+			.exec(function(err, insights) {
+				// console.log("insights",insights[0].count);
+				// console.log(insights);
+				if(insights != undefined && insights[0] != undefined) {
+				    socket.emit('sendinsights', {max: insights[0].count, data: insights}); 
+                }
+    	}); 
     });
 });

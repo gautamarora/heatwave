@@ -1,19 +1,25 @@
-function Track(x, y, uid, name, container, $) {
+function Track(x, y, uid, name, image, container, $) {
 	this.x = x;
 	this.y = y;
 	this.uid = uid;
 	this.name = name;
 
-	this.element = $('<div></div>').addClass('jxy_track');
+	this.element = $('<div></div>').addClass('jxy_track').attr('id', 'jxy_track_' + uid);
 	this.element.html("&#9650;");
 	this.element.css({'left' : this.x, 'top' : this.y});
 	
 	var nameDisplay = $('<div></div>').addClass('jxy_name');
-	nameDisplay.html(name);
+	nameDisplay.append($('<div></div>').addClass('jxy_image').append($('<img></img>').attr('src', image)));
+	nameDisplay.append($('<div></div>').addClass('jxy_name_text').html(name));
+	nameDisplay.append($('<div></div>').addClass('jxy_clear'));
 	this.element.append(nameDisplay);
 
 	this.container = container;
 	$(container).append(this.element);
+}
+
+Track.prototype.remove = function($) {
+	$('#jxy_track_' + this.uid).remove();
 }
 
 Track.prototype.moveTo = function(x, y) {

@@ -21,7 +21,7 @@ module.exports = {
     }
   , mongo: {
         url: {
-            development: 'mongodb://192.168.110.137:27017/'
+            development: 'mongodb://192.168.110.172:27017/'
           , test:        'mongodb://localhost:27017/'
           , beta:        'mongodb://localhost:27017/'
           , production:  'mongodb://localhost:27017/'
