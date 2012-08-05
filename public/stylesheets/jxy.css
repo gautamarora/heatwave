@@ -213,6 +213,19 @@
 	margin-top:3px;
 }
 
+.jxy_static_click {
+	width:8px;
+	height:8px;
+	border-radius:4px;
+	position:absolute;
+	background: -webkit-linear-gradient(top, #b6e026 0%,#abdc28 100%);
+	z-index:1030;
+}
+
+.jxy_leave_click {
+	background: -webkit-linear-gradient(top, #ff3019 0%,#cf0404 100%);
+}
+
 .iPhoneCheckContainer {
   -webkit-transform:translate3d(0,0,0);
   position: relative;

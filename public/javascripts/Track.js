@@ -19,6 +19,9 @@ function Track(x, y, uid, name, image, container, $) {
 }
 
 Track.prototype.remove = function($) {
+	var click = $('<div></div>').addClass('jxy_static_click jxy_leave_click');
+    click.css({left:this.x, top:this.y});
+    $('body').append(click);
 	$('#jxy_track_' + this.uid).remove();
 }
 

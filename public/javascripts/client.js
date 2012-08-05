@@ -161,6 +161,7 @@ window.jxy = (function($){
     } else {
       if(move.c) {
         clients[user.uid].click(move.x, move.y, $);
+        insertClick(move.x, move.y);
       } else {
         clients[user.uid].moveTo(move.x, move.y);
       }
@@ -170,12 +171,18 @@ window.jxy = (function($){
     }
   };
 
+  var insertClick = function(x, y) {
+    var click = $('<div></div>').addClass('jxy_static_click');
+    click.css({left:x, top:y});
+    $('body').append(click);
+  };
+
   var handleDisconnected = function(data) {
     if(data.who.uid in clients) {
         clients[data.who.uid].remove($);
         delete clients[data.who.uid];
     }
-  }
+  };
 
   function getPosition(data) {
     var x = data.x;
@@ -184,7 +191,7 @@ window.jxy = (function($){
     var diff = Math.abs(adminMax - clientMax) / 2 * (adminMax > clientMax ? 1 : -1);
     data.x = x + diff;
     return data;
-  }
+  };
 
   function payload(event, click) {
     return {
@@ -194,7 +201,7 @@ window.jxy = (function($){
       u : uid,
       maxw : $(window).width()
     };
-  }
+  };
 
   function divWithClass(className) {
     return $('<div></div>').addClass(className);
