@@ -218,12 +218,12 @@
 	height:8px;
 	border-radius:4px;
 	position:absolute;
-	background: -webkit-linear-gradient(top, #b6e026 0%,#abdc28 100%);
+	background: -webkit-linear-gradient(top, #ffd65e 0%,#febf04 100%);
 	z-index:1030;
 }
 
 .jxy_leave_click {
-	background: -webkit-linear-gradient(top, #ff3019 0%,#cf0404 100%);
+	background: -webkit-linear-gradient(top, #b6e026 0%,#abdc28 100%);
 }
 
 .iPhoneCheckContainer {
