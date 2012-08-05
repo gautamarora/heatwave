@@ -75,6 +75,11 @@ window.jxy = (function($){
     drawOverlay();
     createHeatmap();
     createAdminBar();
+    $(window).resize(function() { 
+        if(Math.abs($(window).width() - 1350) < 10) {
+            console.log('Good');
+        }
+    })
   };
 
   var drawOverlay = function() {
