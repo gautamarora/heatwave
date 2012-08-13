@@ -23,11 +23,18 @@ window.hwclient = (function($){
   };
 
   var handleStart = function(data) {
+    var moveLock = false;
     $(document).on('click', function(event) {
       socket.emit('move', payload(event, true));
     });
     $(document).on('mousemove', function(event) {
-      socket.emit('move', payload(event, false));
+      if(!moveLock) {
+        moveLock = true;
+        socket.emit('move', payload(event, false));
+        setTimeout(function(){
+          moveLock = false;
+        }, 100);
+      }
     });
   };
 
