@@ -5,7 +5,7 @@ function Track(x, y, uid, name, image, container, $) {
 	this.name = name;
 
 	this.element = $('<div></div>').addClass('jxy_track').attr('id', 'jxy_track_' + uid);
-	this.element.html("&#9650;");
+	this.element.append($('<div></div>').addClass('jxy_track_arrow').html("&#9650;"));
 	this.element.css({'left' : this.x, 'top' : this.y});
 	
 	var nameDisplay = $('<div></div>').addClass('jxy_name');
