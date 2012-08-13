@@ -7,8 +7,8 @@ window.hwclient = (function($){
   self.init = function(options) {
     socket = io.connect(options.host + ':' + options.port);
     uid = options.uid;
-    initClient(); 
-    listenEvents();   
+    initClient();
+    listenEvents();
   };
 
   var initClient = function() {
@@ -51,7 +51,7 @@ window.hwclient = (function($){
       u : uid,
       maxw : $(window).width()
     };
-  };
+  }
 
   return self;
 })(jQuery);

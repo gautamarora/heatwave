@@ -7,6 +7,6 @@ block content
             jQuery(document).ready(function() {
                 var server = 'http://ec2-50-16-176-36.compute-1.amazonaws.com';
                 hwloader.load(server, 3000, function() {
-                        hwadmin.init({uid : #{uid}, host : server, port : 3000});
+                        hwclient.init({uid : #{uid}, host : server, port : 3000});
                 });
             }); 

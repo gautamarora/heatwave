@@ -1,5 +1,5 @@
 jQuery.noConflict();
-window.hwadmin = (function($){
+window.hwclient = (function($){
   var self = {};
 
   var isAdmin = false;
@@ -16,11 +16,11 @@ window.hwadmin = (function($){
     socket = io.connect(options.host + ':' + options.port);
     uid = options.uid;
     initAdmin();
-    listenEvents();   
+    listenEvents();
   };
 
   var showLoader = function() {
-    if($('.jxy_loader').length == 0) {
+    if($('.jxy_loader').length === 0) {
         var loader = $('<div></div>').addClass('jxy_loader');
         var inner = $('<div></div>').addClass('jxy_loader_inner');
         $(loader).append(inner);
@@ -43,11 +43,11 @@ window.hwadmin = (function($){
 
   var hideInsights = function() {
     if(showingInsights) {
-        showingInsights = false;     
+        showingInsights = false;
         heatmap.store.setDataSet({max:0, data:{}});
         $('.jxy_track, .jxy_static_click').show();
     }
-  }
+  };
 
   var handleInsightsReceieve = function(data) {
     showingInsights = true;
@@ -61,29 +61,29 @@ window.hwadmin = (function($){
     drawOverlay();
     createHeatmap();
     createAdminBar();
-    $(window).resize(function() { 
+    $(window).resize(function() {
         if(Math.abs($(window).width() - 1350) < 10) {
             console.log('Good');
         }
-    })
+    });
   };
 
   var drawOverlay = function() {
-    if($('.jxy_overlay').length == 0) {
+    if($('.jxy_overlay').length === 0) {
         var overlay = divWithClass('jxy_overlay');
         var overlay_inner = divWithClass('jxy_overlay_inner');
         var overlay_heatmap = divWithClass('jxy_heatmap');
         $(overlay).append(overlay_heatmap);
         $(overlay).append(overlay_inner);
         $('body').append(overlay);
-    }   
+    }
   };
 
   var createHeatmap = function() {
     if(!heatmap) {
         heatmap = h337.create({'element' : $('.jxy_heatmap')[0], 'radius' : 25, 'visible' : true});
     }
-  }
+  };
 
   var createAdminBar = function() {
     var adminBar = divWithClass('jxy_admin_bar');
@@ -100,7 +100,7 @@ window.hwadmin = (function($){
             divWithClass('jxy_toggle').append(
                 $('<input></input>').attr('type', 'checkbox').attr('id', 'jxy_toggle_map')));
     adminBarSections[3] = divWithClass('jxy_admin_bar_count jxy_admin_bar_section').append(
-        divWithClass('jxy_admin_bar_count_label').html('Users:')).append( 
+        divWithClass('jxy_admin_bar_count_label').html('Users:')).append(
         divWithClass('jxy_admin_bar_count_number').attr('id', 'jxy_admin_bar_count').html(0));
     adminBarSections[4] = divWithClass('jxy_admin_bar_insights jxy_admin_bar_section jxy_admin_bar_section_nopad jxy_admin_bar_section_last').append(divWithClass('jxy_logo jxy_glass_logo'));
     adminBarSections[4].append(divWithClass('jxy_admin_bar_insights_text').html('Show Insights').click(handleInsightClick));
@@ -109,7 +109,7 @@ window.hwadmin = (function($){
     });
     $('.jxy_overlay').append(adminBar);
     $('.jxy_admin_bar input[type=checkbox]').iphoneStyle({onChange:handleToggleChange});
-  }
+  };
 
   var handleToggleChange = function(elem, value) {
     if(elem.attr('id') == 'jxy_toggle_map') {
@@ -124,7 +124,7 @@ window.hwadmin = (function($){
             $('.jxy_overlay_inner, .jxy_heatmap, .jxy_static_click').hide();
         }
     }
-  }
+  };
 
   var handleInsightClick = function() {
     if(showingInsights) {
@@ -134,12 +134,12 @@ window.hwadmin = (function($){
         showInsights();
         $('.jxy_admin_bar_insights_text').html('Hide Insights');
     }
-  }
+  };
 
   var listenEvents = function() {
     socket.on('moved', handleMove);
     socket.on('reconnect', initAdmin);
-    socket.on('disconnected', handleDisconnected)
+    socket.on('disconnected', handleDisconnected);
   };
 
   var handleMove = function(data) {
@@ -158,7 +158,7 @@ window.hwadmin = (function($){
         clients[user.uid].moveTo(move.x, move.y);
       }
     }
-    if(realtimeHeatmap){ 
+    if(realtimeHeatmap){
         heatmap.store.addDataPoint(move.x, move.y);
     }
   };
@@ -185,7 +185,7 @@ window.hwadmin = (function($){
     var diff = Math.abs(adminMax - clientMax) / 2 * (adminMax > clientMax ? 1 : -1);
     data.x = x + diff;
     return data;
-  };
+  }
 
   function payload(event, click) {
     return {
@@ -195,7 +195,7 @@ window.hwadmin = (function($){
       u : uid,
       maxw : $(window).width()
     };
-  };
+  }
 
   function divWithClass(className) {
     return $('<div></div>').addClass(className);
