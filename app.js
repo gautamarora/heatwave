@@ -153,9 +153,13 @@ io.sockets.on('connection', function (socket) {
                                 console.log("statusCode: ", res.statusCode);
                                 res.on('data', function(d) {
                                     obj = JSON.parse(d);
-                                    console.log("userimage: ", obj.results.profile.profileimage);
-                                    socket.uname = obj.results.profile.nickname;
-                                    socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
+                                    if(obj.results.profile) {
+                                      console.log("userimage: ", obj.results.profile.profileimage);
+                                      socket.uname = obj.results.profile.nickname;
+                                      socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
+                                    } else {
+                                      socket.uname = socket.uid;
+                                    }
                                     
                                     //save user info to db
                                     var user = new User();
@@ -247,7 +251,7 @@ io.sockets.on('connection', function (socket) {
 			.sort('count', -1)
 			.exec(function(err, insights) {
 				// console.log("insights",insights[0].count);
-				// console.log(insights);
+				console.log(insights);
 				if(insights != undefined && insights[0] != undefined) {
 				    socket.emit('sendinsights', {max: insights[0].count, data: insights}); 
                 }
