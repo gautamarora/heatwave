@@ -1,23 +1,19 @@
-// FOR FIRST ADMIN USER
-// mongo
-// use memecube-production (or whichever database you're using)
-// admin = db.users.findOne({'twit.screenName': 'gautam'})
-// admin = db.users.findOne({'twit.screenName': 'justinschier'})
-// admin = db.users.findOne({'twit.screenName': 'dopalabs'})
-// admin = db.users.findOne({'twit.screenName': 'memecube'})
-// admin.role = "admin"
-// db.users.save(admin)
-
 module.exports = {
     app: {
        	name:            	'HeatWave'
 			, version: 					'0.1'
     }
   , hostname: {
-        development:     'http://localhost:3000'
+        development:     'http://localhost:3000' 
       , test:            'http://localhost:3001'
       , beta:            'http://localhost:3000'
       , production:      'http://localhost:3000'
+    }
+  , server: {
+        development:     'http://192.168.110.137:3000'
+      , test:            'http://192.168.110.137:3001'
+      , beta:            'http://192.168.110.137:3000'
+      , production:      'http://192.168.110.137:3000'
     }
   , mongo: {
         url: {
@@ -35,16 +31,16 @@ module.exports = {
     }
   , redis: {
         secret: {
-            development: 'nudrUF5uswU7ESpa62wrEh6mUmechaxa'
-          , test:        'wReTha2usaDRudrurupatAR4Th3VAkaP'
-          , beta:        'murEt2egEnEcHupra6rATaGatuwrUbab'
-          , production:  'treMeTHubemaJacHasPab2udame8uQeH'
+            development: ''
+          , test:        ''
+          , beta:        ''
+          , production:  ''
         }
       , url: {
-            development: 'redis://127.0.0.1:9007/'
-          , test:        'redis://127.0.0.1:9007/'
+            development: 'redis://localhost:9007/'
+          , test:        'redis://localhost:9007/'
           , beta:        ''
-          , production:  'redis://127.0.0.1:9007/'
+          , production:  'redis://localhost:9007/'
         }
     }
 };

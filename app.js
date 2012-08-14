@@ -19,18 +19,21 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 var env = process.env.NODE_ENV;
 kProduction = env === 'production';
 
+var server = conf.server[env];
+
 //global mongoose
 mongoose              = require('mongoose');
 Schema                = mongoose.Schema;
 ObjectId              = mongoose.SchemaTypes.ObjectId;
-User                                    = mongoose.model('User', require('./models/user'));
-Move                                    = mongoose.model('Move', require('./models/move'));
+User                  = mongoose.model('User', require('./models/user'));
+Move                  = mongoose.model('Move', require('./models/move'));
 Metric 								= mongoose.model('Metric', require('./models/metric'));
 var db = mongoose.connect(conf.mongo.url[env]+conf.mongo.dbname[env], function(err) { if (err) { throw err; } });
 
 var app = express();
 
 app.configure(function(){
+  app.set('server', server);
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
@@ -58,53 +61,40 @@ server = http.createServer(app).listen(app.get('port'), function(){
 
 //global socket.io
 io = require('socket.io').listen(server);
-
-// users = [];
-// sessions = [];
-adminSocketId = '';
-// var parseCookie = require('connect').utils.parseCookie;
-// io.set('authorization', function (data, accept) {
-//     if (data.headers.cookie) {
-//         data.cookie = parseCookie(data.headers.cookie);
-//         
-//         data.sessionID = data.cookie['connect.sid'];
-//     } else {
-//        return accept('No cookie transmitted.', false);
-//     }
-//     accept(null, true);
-// });
-// io.enable('browser client minification');  // send minified client
-// io.enable('browser client etag');          // apply etag caching logic based on version number
-// io.enable('browser client gzip');          // gzip the file
+var RedisStore = require('socket.io/lib/stores/redis')
+	, redis = require('socket.io/node_modules/redis')
+  , pub    = redis.createClient()
+  , sub    = redis.createClient()
+  , client = redis.createClient();
+io.set('store', new RedisStore({
+  redisPub : pub
+, redisSub : sub
+, redisClient : client
+}));
+io.enable('browser client minification');  // send minified client
+io.enable('browser client etag');          // apply etag caching logic based on version number
+io.enable('browser client gzip');          // gzip the file
 io.set('log level', 1);                    // reduce logging
-// io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-//     'websocket'
-//   , 'flashsocket'
-//   , 'htmlfile'
-//   , 'xhr-polling'
-//   , 'jsonp-polling'
-// ]);
+io.set('transports', [                     // enable all transports (optional if you want flashsocket)
+    'websocket'
+  , 'flashsocket'
+  , 'htmlfile'
+  , 'xhr-polling'
+  , 'jsonp-polling'
+]);
 
 
 io.sockets.on('connection', function (socket) {
     
     var socketId = socket.id
-    // , sessionId = socket.handshake.sessionID;
-  
+
     console.log("server:got connection from " + socket.id);
-  // if(!(_.contains(sessions, sessionId))) {
-  //   sessions.push(sessionId);
-  //   socket.emit('connected', { socketId: socketId, sessionId: socket.handshake.sessionID });
-  //   socket.broadcast.emit('someone-connected', { socketId: socketId, sessionId: socket.handshake.sessionID });
-  // } else {
-  //   socket.emit('connected', { socketId: socketId, sessionId: socket.handshake.sessionID });
-  // }
     
     socket.on('disconnect', function () {
         console.log("server:got disconnect from ");
-        if(adminSocketId) {
-            io.sockets.socket(adminSocketId).emit('disconnected', {who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
-        }
+				if(socket.role == 'admin') {
+					socket.leave('admin');
+				}
   });
   
     socket.on('init', function(data) {
@@ -114,14 +104,13 @@ io.sockets.on('connection', function (socket) {
 
         if(socket.role == 'admin') {
             console.log("server:admin is in the house");
-            adminSocketId = socket.id;
-            socket.name = 'admin';
+						socket.join('admin');
+            socket.name = 'admin-'+socket.id;
             socket.uname = 'admin';
             socket.fname = 'admin';
             socket.lname = 'admin';
             socket.uimg = '';
         } else {
-            //TODO KAM hit API and get the name, image
             var optionsgetUserName = {
                 host : 'api.corporateperks.com', // here only the domain name
                 port : 80,
@@ -211,11 +200,9 @@ io.sockets.on('connection', function (socket) {
         } else {
             console.log("server: moved " + socket.uname);
         }
-        
-        if(adminSocketId) {
-            io.sockets.socket(adminSocketId).emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
-        }
 
+				io.sockets.in('admin').emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
+				
         var move = new Move();
         move.x = data.x;
         move.y = data.y;
@@ -254,7 +241,7 @@ io.sockets.on('connection', function (socket) {
 				console.log(insights);
 				if(insights != undefined && insights[0] != undefined) {
 				    socket.emit('sendinsights', {max: insights[0].count, data: insights}); 
-                }
+        }
     	}); 
     });
 });

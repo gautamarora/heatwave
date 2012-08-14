@@ -1,14 +1,17 @@
 var jxyloader = (function() {
+	
+	
 	var self = {};
+	self.server = "http://192.168.110.137:3000";
 
 	self.load = function(callback) {
-		createStyle("http://192.168.110.172:3000/stylesheets/jxy.css", function() {
+		createStyle(self.server + "/stylesheets/jxy.css", function() {
 			createScript("https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js", function() {
-				createScript("http://192.168.110.172:3000/socket.io/socket.io.js", function() {
-					createScript("http://192.168.110.172:3000/javascripts/client.js", function() {
-						createScript("http://192.168.110.172:3000/javascripts/Track.js", function() {
-							createScript("http://192.168.110.172:3000/javascripts/heatmap.js", function() {
-								createScript("http://192.168.110.172:3000/javascripts/iphone.js", function() {
+				createScript(self.server + "/socket.io/socket.io.js", function() {
+					createScript(self.server + "/javascripts/client.js", function() {
+						createScript(self.server + "/javascripts/Track.js", function() {
+							createScript(self.server + "/javascripts/heatmap.js", function() {
+								createScript(self.server + "/javascripts/iphone.js", function() {
 									callback();
 								});
 							});

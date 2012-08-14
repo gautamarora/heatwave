@@ -13,7 +13,7 @@ window.jxy = (function($){
   var realtimeHeatmap = false;
 
   self.init = function(options) {
-    socket = io.connect(options.host + ':' + options.port);
+    socket = io.connect(options.host + ':' + options.port, {"reconnect":false});
     uid = options.uid;
     if(options.insights == 0) {
         if(options.role == 'client') {
