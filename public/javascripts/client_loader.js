@@ -3,12 +3,12 @@ var hwloader = (function() {
 
 	self.load = function(server, port, callback) {
 			createScript(server + ':' + port + "/socket.io/socket.io.js", function() {
-				createScript(server + ':' + port + "/javascripts/client2.js", function() {
+				createScript(server + ':' + port + "/javascripts/client.js", function() {
 					callback();
 				});
 			});
 
-	}	
+	};
 
 	function createScript(url, callback) {
 		var script = document.createElement('script');
