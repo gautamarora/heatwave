@@ -1,11 +1,11 @@
 jQuery.noConflict();
-window.hwclient = (function($){
+window.hwclient = (function(){
   var self = {};
   
   var uid = '';
 
   self.init = function(options) {
-    socket = io.connect(options.host + ':' + options.port);
+    socket = io.connect(options.host + ':' + options.port, {"reconnect" : false});
     uid = options.uid;
     initClient();
     listenEvents();
@@ -24,10 +24,10 @@ window.hwclient = (function($){
 
   var handleStart = function(data) {
     var moveLock = false;
-    $(document).on('click', function(event) {
+    $(document).observe('click', function(event) {
       socket.emit('move', payload(event, true));
     });
-    $(document).on('mousemove', function(event) {
+    $(document).observe('mousemove', function(event) {
       if(!moveLock) {
         moveLock = true;
         socket.emit('move', payload(event, false));
@@ -39,8 +39,8 @@ window.hwclient = (function($){
   };
 
   var handleEnd = function(data) {
-    $(document).off('click');
-    $(document).off('mousemove');
+    $(document).stopObserving('click');
+    $(document).stopObserving('mousemove');
   };
 
   function payload(event, click) {
@@ -49,9 +49,9 @@ window.hwclient = (function($){
       y : event.pageY,
       c : click,
       u : uid,
-      maxw : $(window).width()
+      maxw : document.viewport.getDimensions().width
     };
   }
 
   return self;
-})(jQuery);
+})();
