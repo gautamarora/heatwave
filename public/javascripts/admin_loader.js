@@ -35,7 +35,8 @@ var hwloader = (function() {
 		script.onload = function() {
 			callback();
 		};
-		jQuery.noConflict();
+		if(typeof jQuery != 'undefined')
+			jQuery.noConflict();
 		document.getElementsByTagName('head')[0].appendChild(script);
 	}
 

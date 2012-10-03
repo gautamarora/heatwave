@@ -1,4 +1,3 @@
-jQuery.noConflict();
 window.hwclient = (function(){
   var self = {};
   
@@ -52,6 +51,6 @@ window.hwclient = (function(){
       maxw : document.viewport.getDimensions().width
     };
   }
-
+	console.log('client loaded...');
   return self;
 })();

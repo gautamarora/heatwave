@@ -90,10 +90,12 @@ io.sockets.on('connection', function (socket) {
 
     console.log("server:got connection from " + socket.id);
     
-    socket.on('disconnect', function () {
-        console.log("server:got disconnect from ");
+    socket.on('disconnect', function (data) {
+        console.log("server:got disconnect from " + socket.uname);
 				if(socket.role == 'admin') {
 					socket.leave('admin');
+				} else {
+					io.sockets.in('admin').emit('disconnected', {data: data, who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
 				}
   });
   
@@ -238,7 +240,7 @@ io.sockets.on('connection', function (socket) {
 			.sort('count', -1)
 			.exec(function(err, insights) {
 				// console.log("insights",insights[0].count);
-				console.log(insights);
+				// console.log(insights);
 				if(insights != undefined && insights[0] != undefined) {
 				    socket.emit('sendinsights', {max: insights[0].count, data: insights}); 
         }

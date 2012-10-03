@@ -201,5 +201,6 @@ window.hwclient = (function($){
     return $('<div></div>').addClass(className);
   }
 
+	console.log('admin loaded...');
   return self;
 })(jQuery);

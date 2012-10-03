@@ -17,7 +17,6 @@ var hwloader = (function() {
 		script.onload = function() {
 			callback();
 		};
-		jQuery.noConflict();
 		document.getElementsByTagName('head')[0].appendChild(script);
 	}
 
