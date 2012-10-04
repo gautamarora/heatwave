@@ -10,10 +10,10 @@ module.exports = {
       , production:      'http://localhost:3000'
     }
   , server: {
-        development:     'http://192.168.110.137:3000'
-      , test:            'http://192.168.110.137:3001'
-      , beta:            'http://192.168.110.137:3000'
-      , production:      'http://192.168.110.137:3000'
+        development:     'http://192.168.110.68:3000'
+      , test:            'http://192.168.110.68:3001'
+      , beta:            'http://192.168.110.68:3000'
+      , production:      'http://192.168.110.68:3000'
     }
   , mongo: {
         url: {

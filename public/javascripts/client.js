@@ -32,8 +32,8 @@ window.hwclient = (function(){
     $(document).observe('mousemove', function(event) {
       if(!moveLock) {
         moveLock = true;
-				console.log(moveX, event.pageX);
-				console.log(moveY, event.pageY);
+				// console.log(moveX, event.pageX);
+				// console.log(moveY, event.pageY);
 				if(moveX != event.pageX && moveY != event.pageY) {
 					moveX = event.pageX;
 					moveY = event.pageY;
