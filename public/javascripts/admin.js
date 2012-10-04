@@ -201,6 +201,6 @@ window.hwclient = (function($){
     return $('<div></div>').addClass(className);
   }
 
-	console.log('admin loaded...');
+	// console.log('heatwave admin loaded...');
   return self;
 })(jQuery);

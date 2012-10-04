@@ -100,7 +100,7 @@ io.sockets.on('connection', function (socket) {
   });
   
     socket.on('init', function(data) {
-        console.log("server:got init" + data.role);
+        console.log("server:got init " + data.uid + ' as ' + data.role);
         socket.uid = data.uid;
         socket.role = data.role;
 
@@ -126,7 +126,9 @@ io.sockets.on('connection', function (socket) {
                 path : '/profile/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
                 method : 'GET' // do GET
             };
-            User.findOne({"id": socket.uid}, function foundUser(err, user) {
+						console.log(optionsgetUserName);
+            console.log(socket.uid);
+						User.findOne({"id": socket.uid}, function foundUser(err, user) {
                 if(!user) {
                     console.log("server:we have a client with no user info")
                     // get user name
@@ -134,7 +136,7 @@ io.sockets.on('connection', function (socket) {
                         console.log("statusCode: ", res.statusCode);
                         res.on('data', function(d) {
                             obj = JSON.parse(d);
-                            console.log("firstname: ", obj.results.user.firstName);
+                            console.log("firstname: ", obj.results.user);
                             socket.fname = obj.results.user.firstName;
                             socket.lname = obj.results.user.lastName;
                             
@@ -196,11 +198,11 @@ io.sockets.on('connection', function (socket) {
     });
     
     socket.on('move', function(data) {
-        console.log("someone is on the move...");
+        // console.log("someone is on the move...");
         if(socket.uname == undefined) {
             console.log("ERROR:socket.uname is undefined --> uid",socket.uid)
         } else {
-            console.log("server: moved " + socket.uname);
+            console.log("server: " + socket.uname + " moved to " + data.x + ":" + data.y);
         }
 
 				io.sockets.in('admin').emit('moved', {data: data, who: {uid: socket.uid, uname: socket.uname, uimg: socket.uimg}});
@@ -217,7 +219,7 @@ io.sockets.on('connection', function (socket) {
             // console.log("move" + move);
 						move.save(function(err) {
 						  if (!err) {
-						    console.log("move saved");
+						    // console.log("move saved");
 								//update metric
 								var metric = new Metric();
 								metric.x = (Math.round(data.x/10) * 10) + 5;
@@ -225,7 +227,7 @@ io.sockets.on('connection', function (socket) {
 								var count =  data.c ? 10 : 1;
 								Metric.update({page: 'home', x: metric.x, y: metric.y}, {$inc: { 'count': count }}, {upsert: true}, function(err, metric_updated){
 									if(err) { throw err; }
-						    	return console.log("move metric saved");
+						    	// return console.log("move metric saved");
 								});
 						  } else {
 						    return console.log(err);
