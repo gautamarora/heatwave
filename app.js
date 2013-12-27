@@ -27,7 +27,7 @@ Schema                = mongoose.Schema;
 ObjectId              = mongoose.SchemaTypes.ObjectId;
 User                  = mongoose.model('User', require('./models/user'));
 Move                  = mongoose.model('Move', require('./models/move'));
-Metric 								= mongoose.model('Metric', require('./models/metric'));
+Metric                = mongoose.model('Metric', require('./models/metric'));
 var db = mongoose.connect(conf.mongo.url[env]+conf.mongo.dbname[env], function(err) { if (err) { throw err; } });
 
 var app = express();
@@ -113,76 +113,103 @@ io.sockets.on('connection', function (socket) {
             socket.lname = 'admin';
             socket.uimg = '';
         } else {
-            var optionsgetUserName = {
-                host : 'api.corporateperks.com', // here only the domain name
-                port : 80,
-                path : '/user/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
-                method : 'GET' // do GET
-            };
+	            //get user details
+				var optionsgetUserName = {
+	                host : 'api.corporateperks.com', // here only the domain name
+	                port : 80,
+	                path : '/user/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
+	                method : 'GET' // do GET
+	            };
 
-            var optionsgetUserImage = {
-                host : 'api.corporateperks.com', // here only the domain name
-                port : 80,
-                path : '/profile/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
-                method : 'GET' // do GET
-            };
-						console.log(optionsgetUserName);
-            console.log(socket.uid);
-						User.findOne({"id": socket.uid}, function foundUser(err, user) {
-                if(!user) {
+	            var optionsgetUserImage = {
+	                host : 'api.corporateperks.com', // here only the domain name
+	                port : 80,
+	                path : '/profile/getbyid/id/'+socket.uid+'/?auth=kjrfr6bQcFBJa1BTWOVZJmLwxBbOauxzJWXICklr1MI%3D', 
+	                method : 'GET' // do GET
+	            };
+				// console.log(optionsgetUserName);
+				console.log(socket.uid);
+				User.findOne({"id": socket.uid}, function foundUser(err, user) {
+                
+				if(!user) {
                     console.log("server:we have a client with no user info")
+					
+					//hardcode user info
+					socket.uname = 'hwtest';
+					socket.fname = 'Test';
+					socket.lname = 'Smith';
+					socket.uimg = 'http://imga.nxjimg.com/emp_image/header/black/profile.gif';
+
+                    //save user info to db
+                    var user = new User();
+                    user.id = socket.uid;
+                    user.name = socket.uname;
+                    user.firstname = socket.fname;
+                    user.lastname = socket.lname;
+                    user.image = socket.uimg;
+                    
+                    user.save(function(err) {
+                        if (!err) {
+                          console.log("user saved");
+                          console.log("server:we have a new client");
+                          socket.emit('start', { message: 'you can start now' });
+                        } else {
+                          return console.log(err);
+                        }
+                    });
+										
                     // get user name
-                    var reqGetUserName = http.request(optionsgetUserName, function(res) {
-                        console.log("statusCode: ", res.statusCode);
-                        res.on('data', function(d) {
-                            obj = JSON.parse(d);
-                            console.log("firstname: ", obj.results.user);
-                            socket.fname = obj.results.user.firstName;
-                            socket.lname = obj.results.user.lastName;
-                            
-                            //now get user image
-                            console.log(optionsgetUserImage.path);
-                            var reqGetUserImage = http.request(optionsgetUserImage, function(res) {
-                                console.log("statusCode: ", res.statusCode);
-                                res.on('data', function(d) {
-                                    obj = JSON.parse(d);
-                                    if(obj.results.profile) {
-                                      console.log("userimage: ", obj.results.profile.profileimage);
-                                      socket.uname = obj.results.profile.nickname;
-                                      socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
-                                    } else {
-                                      socket.uname = socket.uid;
-                                    }
-                                    
-                                    //save user info to db
-                                    var user = new User();
-                                    user.id = socket.uid;
-                                    user.name = socket.uname;
-                                    user.firstname = socket.fname;
-                                    user.lastname = socket.lname;
-                                    user.image = socket.uimg;
-                                    
-                                    user.save(function(err) {
-                                        if (!err) {
-                                          console.log("user saved");
-                                          console.log("server:we have a new client");
-                                          socket.emit('start', { message: 'you can start now' });
-                                        } else {
-                                          return console.log(err);
-                                        }
-                                    });
-                                });
-                            });
-                            reqGetUserImage.end();
-                            reqGetUserImage.on('error', function(e) {
-                                console.error(e);
-                            });
-                        }); 
-                    });
-                    reqGetUserName.end();
-                    reqGetUserName.on('error', function(e) {
-                        console.error(e);
-                    });
+                    // var reqGetUserName = http.request(optionsgetUserName, function(res) {
+                    //     console.log("statusCode: ", res.statusCode);
+                    //     res.on('data', function(d) {
+                    //         obj = JSON.parse(d);
+                    //         console.log("firstname: ", obj.results.user);
+                    //         socket.fname = obj.results.user.firstName;
+                    //         socket.lname = obj.results.user.lastName;
+                    //         
+                    //         //now get user image
+                    //         console.log(optionsgetUserImage.path);
+                    //         var reqGetUserImage = http.request(optionsgetUserImage, function(res) {
+                    //             console.log("statusCode: ", res.statusCode);
+                    //             res.on('data', function(d) {
+                    //                 obj = JSON.parse(d);
+                    //                 if(obj.results.profile) {
+                    //                   console.log("userimage: ", obj.results.profile.profileimage);
+                    //                   socket.uname = obj.results.profile.nickname;
+                    //                   socket.uimg = 'https://imgb.nxjimg.com/emp_image/upload/userprofileimage/'+obj.results.profile.profileimage;
+                    //                 } else {
+                    //                   socket.uname = socket.uid;
+                    //                 }
+                    //                 
+                    //                 //save user info to db
+                    //                 var user = new User();
+                    //                 user.id = socket.uid;
+                    //                 user.name = socket.uname;
+                    //                 user.firstname = socket.fname;
+                    //                 user.lastname = socket.lname;
+                    //                 user.image = socket.uimg;
+                    //                 
+                    //                 user.save(function(err) {
+                    //                     if (!err) {
+                    //                       console.log("user saved");
+                    //                       console.log("server:we have a new client");
+                    //                       socket.emit('start', { message: 'you can start now' });
+                    //                     } else {
+                    //                       return console.log(err);
+                    //                     }
+                    //                 });
+                    //             });
+                    //         });
+                    //         reqGetUserImage.end();
+                    //         reqGetUserImage.on('error', function(e) {
+                    //             console.error(e);
+                    //         });
+                    //     }); 
+                    // });
+                    // reqGetUserName.end();
+                    // reqGetUserName.on('error', function(e) {
+                    //     console.error(e);
+                    // });
                 } else {
                     socket.uname = user.name;
                     socket.fname = user.firstname;

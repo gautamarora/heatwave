@@ -2,7 +2,7 @@ var jxyloader = (function() {
 	
 	
 	var self = {};
-	self.server = "http://192.168.110.137:3000";
+	self.server = "http://127.0.0.1:3000";
 
 	self.load = function(callback) {
 		createStyle(self.server + "/stylesheets/jxy.css", function() {

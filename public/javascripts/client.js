@@ -1,9 +1,11 @@
+jQuery.noConflict();
 window.hwclient = (function(){
   var self = {};
   
   var uid = '';
 
   self.init = function(options) {
+    console.log('client.js: self.init()');
     socket = io.connect(options.host + ':' + options.port, {"reconnect" : false});
     uid = options.uid;
     initClient();
@@ -11,10 +13,12 @@ window.hwclient = (function(){
   };
 
   var initClient = function() {
+    console.log('client.js: self.initClient()');    
     socket.emit('init', {'uid' : uid, 'role' : 'client'});
   };
 
   var listenEvents = function() {
+    console.log('client.js: self.listenEvents()');
     socket.on('start', handleStart);
     socket.on('end', handleEnd);
     socket.on('disconnect', handleEnd);
