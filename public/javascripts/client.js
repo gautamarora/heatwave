@@ -27,22 +27,22 @@ window.hwclient = (function(){
 
   var handleStart = function(data) {
     var moveLock = false,
-				moveX = 0,
-				moveY = 0;
+        moveX = 0,
+        moveY = 0;
     $(document).observe('click', function(event) {
       socket.emit('move', payload(event, true));
     });
-		
+    
     $(document).observe('mousemove', function(event) {
       if(!moveLock) {
         moveLock = true;
-				// console.log(moveX, event.pageX);
-				// console.log(moveY, event.pageY);
-				if(moveX != event.pageX && moveY != event.pageY) {
-					moveX = event.pageX;
-					moveY = event.pageY;
-	        socket.emit('move', payload(event, false));
-				}
+        // console.log(moveX, event.pageX);
+        // console.log(moveY, event.pageY);
+        if(moveX != event.pageX && moveY != event.pageY) {
+          moveX = event.pageX;
+          moveY = event.pageY;
+          socket.emit('move', payload(event, false));
+        }
         setTimeout(function(){
           moveLock = false;
         }, 100);
@@ -64,6 +64,6 @@ window.hwclient = (function(){
       maxw : document.viewport.getDimensions().width
     };
   }
-	// console.log('heatwave client loaded...');
+  // console.log('heatwave client loaded...');
   return self;
 })();

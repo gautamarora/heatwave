@@ -1,7 +1,7 @@
 module.exports = {
     app: {
-       	name:            	'HeatWave'
-			, version: 					'0.1'
+        name:             'HeatWave'
+      , version:          '0.1'
     }
   , hostname: {
         development:     'http://localhost:3000' 

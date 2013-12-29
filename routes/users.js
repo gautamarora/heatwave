@@ -13,7 +13,7 @@ var User = require('../models/user')
           });
         });
 
-        // curl -v -H "Content-Type: application/json" -X POST -d '{"user":{"id":"211126260","name":"gautam", "firstname":"Gautam", "lastname":"Arora"}}' http://192.168.110.137:3000/users
+        // curl -v -H "Content-Type: application/json" -X POST -d '{"user":{"id":"211126260","name":"gautam", "firstname":"Gautam", "lastname":"Arora"}}' http://127.0.0.1:3000/users
         app.post('/', function(req,res) {
           res.send('creating...');
           var user = new User();
