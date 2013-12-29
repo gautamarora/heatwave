@@ -1,4 +1,4 @@
-# HeatWave - Web Analytics through Cursror Tracking
+# HeatWave
 
 Heatwave is a web tracking and analytics application. On the client side, it tracks cursor movement and clicks on a webpage and sends the information to the server over websockets. On the server side, an admin (product manager, developer etc) can watch in realtime how all visitors are interacting with the webpage as well as generate an instant heatmap of the activity.
 
@@ -10,10 +10,10 @@ Heatwave is built using: Node.js, Socket.io (for WebSockets), MongoDB, Heatmap.j
 ## Install
 * Embed client_loader.js or admin_loader.js on your webpage based on the role of the user (sample .jade and .html admin and client versions provided)
 ```html
-    <script type="text/javascript" src="http://<server ip>:<server port>/javascripts/client_loader.js"></script>
+    <script type="text/javascript" src="http://127.0.0.1:3000/javascripts/client_loader.js"></script>
     <script type="text/javascript">
-        hwloader.load('http://'+'<server ip>', '<server port>', function() {
-            hwclient.init({uid : '<user id>', host : '<server ip>', port : '<server port>'});
+        hwloader.load('http://'+'127.0.0.1', '3000', function() {
+            hwclient.init({uid : 1, host : '127.0.0.1', port : '3000'});
         });
     </script>
 ```
