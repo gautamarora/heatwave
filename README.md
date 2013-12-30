@@ -4,8 +4,10 @@ Heatwave is a web tracking and analytics application. On the client side, it tra
 
 Heatwave is built using: Node.js, Socket.io (for WebSockets), MongoDB, Heatmap.js & JQuery
 
+It was built as a hackathon project, and work is underway to cleanup and extend the functionality.
+
 ## Setup
-* Checkout source: `git clone git@github.com:gautamarora/heatwave.git`
+Checkout source: `git clone git@github.com:gautamarora/heatwave.git`
 
 ## Install
 Embed client_loader.js or admin_loader.js on your webpage based on the role of the user (sample .jade and .html code is available)
