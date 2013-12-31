@@ -106,7 +106,7 @@ io.sockets.on('connection', function (socket) {
         socket.role = data.role;
 
         if(socket.role == 'admin') {
-            console.log("server:admin user is watching...");
+            console.log("server:admin has logged in!");
             socket.join('admin');
             socket.name = 'admin-'+socket.uid; //TODO - admin has socket.name, user socket.name is not set
             socket.uname = 'admin';
@@ -116,12 +116,15 @@ io.sockets.on('connection', function (socket) {
         } else {
         
         console.log(socket.uid);
+        
+        //we use the uid to determine if this is an existing user in our backend (based on the user id in the url), or an unknown visitor
+        //if we find the user, we will get the details from db and populate in user object, so the admin can identify the user in his web ui
+        //if we dont find the user, we will insert a new record for this anaonymous user with the uid passed
+        //TODO - a random uid should be generated when not present
         User.findOne({"id": socket.uid}, function foundUser(err, user) {
-                
         if(!user) {
-                    console.log("server:we have a client with no info")
-                    
-                    // TODO - get user details from API, to populate the user object
+                    console.log("server:we have an unknown visitor");
+                    // TODO - get user details from backend, to populate the user object
                     socket.name = 'user-' + socket.uid;
                     socket.uname = 'User-' + socket.uid;
                     socket.fname = 'Unknown';
@@ -145,7 +148,7 @@ io.sockets.on('connection', function (socket) {
                         }
                     });
                 } else {
-                    console.log("server:we have a client and we have the info: " + user);
+                    console.log("server:we have a known visitor with the info: " + user);
                     socket.name = 'user-' + socket.uid;
                     socket.uname = user.name;
                     socket.fname = user.firstname;

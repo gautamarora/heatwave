@@ -1,10 +1,16 @@
-# Introduction
+# What is HeatWave?
 
-Heatwave is a web tracking and analytics application. On the client side, it tracks cursor movement and clicks on a webpage and sends the information to the server over websockets. On the server side, an admin can watch in realtime how all visitors are interacting with the webpage as well as generate an instant heatmap of the activity.
+HeatWave is a Node.js + Socket.io server used to add the capability to watch users in realtime and generate heatmaps using cursor tracking to you existing web application. It can also hook into your exsiting backend to pull the required user information to show the actual users browsing the site. HeatWave was built as a hackathon project last year, and I am currenlty working on cleaning it up, adding simple configuration options as well turning it into a easy to use npm module.
 
-Heatwave is built using: Node.js, Socket.io (for WebSockets), MongoDB, Heatmap.js & JQuery
+## How It Works
+HeatWave works by tracking cursor movement and clicks on the client side and sending this information to the server over websockets. The server acts as a proxy for information being recieved from all clients, logging it and forwarding it to an admin UI where an authenticated user can watch the aggregated stream of user activity. The admin UI also provides an 'insights' interface to display a heatmap of the user activity. 
 
-It was built as a hackathon project, and work is underway to cleanup and extend the functionality.
+Heatwave is built using: 
+* Node.js
+* Socket.io (for sending tracking data over WebSockets)
+* JQuery (for client side cursor tracking)
+* MongoDB (for persisting tracking data)
+* Heatmap.js (for generating heatmaps)
 
 ## Setup
 Checkout source: `git clone git@github.com:gautamarora/heatwave.git`
@@ -21,8 +27,7 @@ Embed client_loader.js or admin_loader.js on your webpage based on the role of t
 ```
 
 ## Run
-* Start the mongo server `mongod`
-* Start the redis server `redis-server`
+* Start the mongo server `mongod` and redis server `redis-server`
 * Start the node server `node app.js`
 * To load client version of webpage, access the url: http://127.0.0.1:3000/test/client/<user id> . You can access this page in multiple browsers to simulate multiple clients visiting the page
 * To load admin version of webpage, access the url: http://127.0.0.1:3000/test/admin/0
