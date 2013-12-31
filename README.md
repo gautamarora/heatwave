@@ -1,6 +1,6 @@
 # What is HeatWave?
 
-HeatWave is a Node.js + Socket.io server used to add the capability to watch users in realtime and generate heatmaps using cursor tracking to you existing web application. It can also hook into your exsiting backend to pull the required user information to show the actual users browsing the site. HeatWave was built as a hackathon project last year, and I am currenlty working on cleaning it up, adding simple configuration options as well turning it into a easy to use npm module.
+HeatWave is a Node.js + Socket.io server to add the capability to watch users in realtime and generate heatmaps to your existing web application using cursor tracking. It can hook into your exsiting backend to pull the required user information to show recognizable users browsing the site. HeatWave was built as a hackathon project last year, and I am currenlty working on cleaning it up, adding simple configuration options as well turning it into a easy to use npm module.
 
 ## How It Works
 HeatWave works by tracking cursor movement and clicks on the client side and sending this information to the server over websockets. The server acts as a proxy for information being recieved from all clients, logging it and forwarding it to an admin UI where an authenticated user can watch the aggregated stream of user activity. The admin UI also provides an 'insights' interface to display a heatmap of the user activity. 
